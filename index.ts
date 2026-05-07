@@ -23,10 +23,10 @@ const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(r
 
 const sendSystemMessage = (message: string): void => {
   const packet = new HPacket('Whisper', HDirection.TOCLIENT)
-  packet.appendInt(1)
+  packet.appendInt(-1)
   packet.appendString(message)
   packet.appendInt(0)
-  packet.appendInt(34)
+  packet.appendInt(30)
   packet.appendInt(0)
   packet.appendInt(-1)
   extension.sendToClient(packet)
@@ -125,7 +125,6 @@ const handleChat = (message: HMessage): void => {
 
 const handleGetGuestRoom = (message: HMessage): void => {
   const packet = message.getPacket()
-  // FIX: packet.readInteger() is the correct gnode-api method for reading 32-bit integers
   const roomId = packet.readInteger()
   const param2 = packet.readInteger()
 
