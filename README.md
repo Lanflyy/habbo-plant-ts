@@ -16,13 +16,19 @@ A browser extension for treating and composting monster plants in Habbo.
 
 ## How to install (manually)
 
-First, install packages
+1. Install dependencies
 
 ```bash
 npm install
 ```
 
-Run the extension
+2. Compile extension
+
+```bash
+npm run build
+```
+
+3. Run the extension
 
 ```bash
 npm run test

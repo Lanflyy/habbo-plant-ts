@@ -74,6 +74,7 @@ const processPlants = async (actionType: 'treat' | 'compost'): Promise<void> => 
 
       try {
         extension.sendToServer(packet)
+        plants.delete(plantId) // Remove from memory so it's not processed again on a rerun
         count++
         await sleep(600)
       } catch (err) {
