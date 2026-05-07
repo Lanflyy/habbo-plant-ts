@@ -145,6 +145,16 @@ const handleQuit = (): void => {
   isInitialized = false
 }
 
+const handleRemovePetFromFlat = (message: HMessage): void => {
+  const packet = message.getPacket()
+  const petId = packet.readInteger()
+  
+  if (plants.has(petId)) {
+    plants.delete(petId)
+    console.log(`Plant ${petId} was picked up and removed from memory. Plants left: ${plants.size}`)
+  }
+}
+
 process.on('uncaughtException', (err: Error) => {
   console.error('Unhandled exception:', err)
 })
@@ -153,3 +163,4 @@ extension.interceptByNameOrHash(HDirection.TOCLIENT, 'Users', handleUsers)
 extension.interceptByNameOrHash(HDirection.TOSERVER, 'Chat', handleChat)
 extension.interceptByNameOrHash(HDirection.TOSERVER, 'GetGuestRoom', handleGetGuestRoom)
 extension.interceptByNameOrHash(HDirection.TOSERVER, 'Quit', handleQuit)
+extension.interceptByNameOrHash(HDirection.TOSERVER, 'RemovePetFromFlat', handleRemovePetFromFlat)
