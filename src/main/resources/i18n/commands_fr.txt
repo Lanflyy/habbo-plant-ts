@@ -1,0 +1,5 @@
+Commandes disponibles :
+
+- :plants           -   Soigne chaque plante vivante dans la pièce actuelle.
+- :plants compost   -   Composte chaque plante morte dans la pièce actuelle.
+- :plants abort     -   Arrête l'action de plante en cours.

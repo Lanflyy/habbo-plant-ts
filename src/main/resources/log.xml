@@ -1,0 +1,13 @@
+<configuration>
+    <appender name="UI" class="extension.logging.UiLogAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>[%d{HH:mm:ss}] %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <logger name="extension" level="DEBUG" additivity="false">
+        <appender-ref ref="UI" />
+    </logger>
+
+    <root level="OFF" />
+</configuration>
