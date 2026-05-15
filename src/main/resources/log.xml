@@ -1,7 +1,7 @@
 <configuration>
     <appender name="UI" class="extension.logging.UiLogAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>[%d{HH:mm:ss}] %msg%n</pattern>
+            <pattern>[%d{HH:mm:ss}] [%level] %msg%n</pattern>
         </layout>
     </appender>
 
