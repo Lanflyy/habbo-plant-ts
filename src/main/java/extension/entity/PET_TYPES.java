@@ -1,4 +1,4 @@
-package extension.entities;
+package extension.entity;
 
 import lombok.Getter;
 

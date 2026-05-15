@@ -1,6 +1,6 @@
 package extension.util;
 
-import extension.entities.PET_TYPES;
+import extension.entity.PET_TYPES;
 import gearth.extensions.parsers.HEntity;
 import gearth.extensions.parsers.HEntityType;
 import lombok.extern.slf4j.Slf4j;
