@@ -126,7 +126,7 @@ public final class PlantManagerFeature {
             log.trace("[Users] handleUsers after update. Plants now: {}", getPlantIds());
 
             setInitialized(true);
-            log.debug("[Users] Parsed {} entities. Added {} pets. Plants in memory: {}", entities.length, addedCount, getPlantCount());
+            log.debug("[Users] Parsed {} entities. Added {} plants. Plants in memory: {}", entities.length, addedCount, getPlantCount());
         } catch (Exception e) {
             log.debug("[Users] Failed to parse room entities", e);
         }

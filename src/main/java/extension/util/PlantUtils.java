@@ -16,7 +16,15 @@ public class PlantUtils {
     		return false;
     	}
     	Object[] stuff = entity.getStuff();
-    	if(stuff[0] == PET_TYPES.PLANT) {
+        Object petType = stuff[0];
+        if (petType == null) {
+            return false;
+        }
+        if(!(petType instanceof Number)) {
+        	log.error("Checking if plant, but stuff[0] is not even a number: {}", stuff[0]);
+        	return false;
+        }
+    	if(((Number) petType).intValue() == PET_TYPES.PLANT.getPetType()) {
     		return true;
     	}
     	return false;
