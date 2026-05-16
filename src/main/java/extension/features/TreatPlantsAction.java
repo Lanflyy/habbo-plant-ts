@@ -97,6 +97,7 @@ public class TreatPlantsAction implements PlantUserAction, PlantProcessingHandle
                     log.debug("[PetInfo] Retrying GetPetInfo for {} (next attempt {}/{})", petId, attempt + 1, PETINFO_MAX_RETRIES);
                 } else {
                     log.debug("[PetInfo] All retries exhausted for {}", petId);
+                    NotificationUtils.showSystemNotificationToUser(manager.getExtension(), "Failed to retrieve plant info for pet " + petId + " after " + PETINFO_MAX_RETRIES + " attempts");
                 }
             }
         }
