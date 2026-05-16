@@ -2,11 +2,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -39,6 +41,29 @@
                      <ComboBox fx:id="logLevelCombo" prefWidth="140.0" style="-fx-border-color:#000000; -fx-border-width:1; -fx-background-color:#ffffff; -fx-text-fill:#000000;" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button text="Clear logs" onAction="#clearLogs" maxWidth="Infinity" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </Tab>
+      <Tab text="Settings">
+         <content>
+            <VBox maxHeight="Infinity" maxWidth="Infinity" spacing="10.0">
+               <padding>
+                  <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+               </padding>
+               <children>
+                  <Label text="Advanced options" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
+                  <Region prefHeight="4.0" />
+                  <HBox spacing="4.0" alignment="CENTER_LEFT">
+                     <children>
+                        <CheckBox fx:id="chkRequestPetInfo" selected="true" text="Request Plant info before treating plant" />
+                        <Button fx:id="btnPetInfoHelp" text="?" mnemonicParsing="false" onAction="#helpPetInfoClick" style="-fx-background-color: transparent; -fx-text-fill: #2b7df6; -fx-font-weight: bold; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 0;" prefWidth="22.0" prefHeight="22.0">
+                           <tooltip>
+                              <Tooltip fx:id="ttPetInfoHelp" text="When enabled, the extension will request plant (pet) info before treating to verify wellbeing and avoid accidental treats." />
+                           </tooltip>
+                        </Button>
                      </children>
                   </HBox>
                </children>

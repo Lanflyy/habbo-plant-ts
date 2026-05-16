@@ -50,20 +50,23 @@ public class TreatPlantsAction implements PlantUserAction, PlantProcessingHandle
 
     @Override
     public boolean process(HEntity plant) {
-        // First request pet info and check wellbeing
-        PetInfoEntity info = requestPetInfo(plant.getId(), 3000);
-        if (info == null) {
-            log.debug("[Treat] No PetInfo received for plant {} - skipping", plant.getId());
-            return false;
+        // Optionally request pet info and check wellbeing
+        if (extension.util.PlantSettings.isRequestPetInfoBeforeTreat()) {
+            PetInfoEntity info = requestPetInfo(plant.getId(), 3000);
+            if (info == null) {
+                log.debug("[Treat] No PetInfo received for plant {} - skipping", plant.getId());
+                return false;
+            }
+
+            long currentMissingWellbeing = info.getMaxWellbeingSeconds() - info.getCurrentWellbeingSeconds();
+            if (currentMissingWellbeing >= 0 && currentMissingWellbeing <= WELLBEING_THRESHOLD_SECONDS) {
+                skippedDueWellbeing.incrementAndGet();
+                log.debug("[Treat] Skipping plant {} due to missing wellbeing {} <= {}", plant.getId(), currentMissingWellbeing, WELLBEING_THRESHOLD_SECONDS);
+                return false;
+            }
         }
 
-        long currentMissingWellbeing = info.getMaxWellbeingSeconds() - info.getCurrentWellbeingSeconds();
-        if (currentMissingWellbeing >= 0 && currentMissingWellbeing <= WELLBEING_THRESHOLD_SECONDS) {
-            skippedDueWellbeing.incrementAndGet();
-            log.debug("[Treat] Skipping plant {} due to missing wellbeing {} <= {}", plant.getId(), currentMissingWellbeing, WELLBEING_THRESHOLD_SECONDS);
-            return false;
-        }
-
+        // rate-limit before sending Treat
         SleepRateLimit.sleepRateLimit();
 
         String packetHeader = "RespectPet";
