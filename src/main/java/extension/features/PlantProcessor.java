@@ -70,10 +70,18 @@ public class PlantProcessor {
             }
 
             if (processing.get()) {
-                NotificationUtils.showSystemNotificationToUser(extension, "All plants have been " + actionType.getVerb() + " (" + count + ")");
                 log.debug("[Plants] Finished. {} plants {}", count, actionType.getVerb());
+                try {
+                    handler.onFinished(count);
+                } catch (Exception e) {
+                    log.debug("[Plants] Handler onFinished threw an exception", e);
+                }
+                try {
+                    handler.showSystemNotification(extension, actionType, count);
+                } catch (Exception e) {
+                    log.debug("[Plants] Handler showSystemNotification threw an exception", e);
+                }
             } else {
-                NotificationUtils.showSystemNotificationToUser(extension, "Plant processing aborted.");
                 log.debug("[Plants] Processing aborted");
             }
         } catch (Exception e) {
@@ -85,6 +93,10 @@ public class PlantProcessor {
 
     public void abortProcessing() {
         processing.set(false);
+    }
+
+    public boolean isProcessing() {
+        return processing.get();
     }
 
     // Per-action processing moved to PlantProcessingHandler implementations

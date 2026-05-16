@@ -2,11 +2,18 @@ package extension.features;
 
 import extension.util.NotificationUtils;
 import extension.util.PlantUtils;
+import extension.entity.PetInfoEntity;
 import gearth.extensions.parsers.HEntity;
 import gearth.protocol.HMessage;
 import gearth.protocol.HPacket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import gearth.extensions.ExtensionForm;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -14,6 +21,9 @@ public class TreatPlantsAction implements PlantUserAction, PlantProcessingHandle
 
     private final PlantManagerFeature manager;
     private final PlantProcessor processor;
+    private final AtomicInteger skippedDueWellbeing = new AtomicInteger(0);
+    private static final int WELLBEING_THRESHOLD_SECONDS = 3600; // 1 hour
+    private static final Map<Integer, CompletableFuture<PetInfoEntity>> petInfoRequests = new ConcurrentHashMap<>();
 
     @Override
     public void execute() {
@@ -38,13 +48,76 @@ public class TreatPlantsAction implements PlantUserAction, PlantProcessingHandle
 
     @Override
     public boolean process(HEntity plant) {
+        // First request pet info and check wellbeing
+        PetInfoEntity info = requestPetInfo(plant.getId(), 5000);
+        if (info == null) {
+            log.debug("[Treat] No PetInfo received for plant {} - skipping", plant.getId());
+            return false;
+        }
+
+        long currentMissingWellbeing = info.getMaxWellbeingSeconds() - info.getCurrentWellbeingSeconds();
+        if (currentMissingWellbeing >= 0 && currentMissingWellbeing <= WELLBEING_THRESHOLD_SECONDS) {
+            skippedDueWellbeing.incrementAndGet();
+            log.debug("[Treat] Skipping plant {} due to missing wellbeing {} <= {}", plant.getId(), currentMissingWellbeing, WELLBEING_THRESHOLD_SECONDS);
+            return false;
+        }
+
         String packetHeader = "RespectPet";
         boolean sent = manager.getExtension().sendToServer(new HPacket(packetHeader, HMessage.Direction.TOSERVER, plant.getId()));
         log.debug("[{}] Plant {} {}", packetHeader, plant.getId(), sent ? "sent" : "failed");
         if (sent) {
-            manager.removePlantById(plant.getId());
             return true;
         }
         return false;
+    }
+
+    private PetInfoEntity requestPetInfo(int petId, long timeoutMillis) {
+        CompletableFuture<PetInfoEntity> future = new CompletableFuture<>();
+        petInfoRequests.put(petId, future);
+        boolean sent = manager.getExtension().sendToServer(new HPacket("GetPetInfo", HMessage.Direction.TOSERVER, petId));
+        if (!sent) {
+            petInfoRequests.remove(petId);
+            log.debug("[PetInfo] Failed to send GetPetInfo for {}", petId);
+            return null;
+        }
+        try {
+            return future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+        } catch (Exception e) {
+            petInfoRequests.remove(petId);
+            log.debug("[PetInfo] Timed out or failed waiting for PetInfo for {}", petId);
+            return null;
+        }
+    }
+
+    public static void handlePetInfo(HMessage hMessage) {
+        HPacket packet = hMessage.getPacket();
+        try {
+            packet.resetReadIndex();
+            PetInfoEntity info = PetInfoEntity.fromPacket(packet);
+            CompletableFuture<PetInfoEntity> future = petInfoRequests.remove(info.getPetId());
+            if (future != null) {
+                future.complete(info);
+            } else {
+                log.trace("[PetInfo] Received PetInfo for {} but no pending request", info.getPetId());
+            }
+        } catch (Exception e) {
+            log.debug("[PetInfo] Failed to parse PetInfo packet", e);
+        }
+    }
+
+    @Override
+    public void onFinished(int processedCount) {
+        int skipped = skippedDueWellbeing.get();
+        log.debug("[Treat] Processing complete. treated={}, skippedWellbeing={}", processedCount, skipped);
+    }
+
+    @Override
+    public void showSystemNotification(ExtensionForm extension, PlantManagerFeature.ActionCommandType actionType, int processedCount) {
+        int skipped = skippedDueWellbeing.get();
+        String msg = "All plants have been " + actionType.getVerb() + " (" + processedCount + ")";
+        if (skipped > 0) {
+            msg += ", skipped due to wellbeing: " + skipped;
+        }
+        NotificationUtils.showSystemNotificationToUser(manager.getExtension(), msg);
     }
 }

@@ -47,6 +47,7 @@ public final class PlantManagerFeature {
 
         extension.intercept(HMessage.Direction.TOCLIENT, "Users", this::handleUsers);
         extension.intercept(HMessage.Direction.TOCLIENT, "UserRemove", this::handleUserRemove);
+        extension.intercept(HMessage.Direction.TOCLIENT, "PetInfo", TreatPlantsAction::handlePetInfo);
         extension.intercept(HMessage.Direction.TOSERVER, "Chat", this::handleChat);
         extension.intercept(HMessage.Direction.TOSERVER, "GetGuestRoom", this::handleGetGuestRoom);
         extension.intercept(HMessage.Direction.TOSERVER, "Quit", this::handleQuit);
