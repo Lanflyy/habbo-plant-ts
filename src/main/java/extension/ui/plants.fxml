@@ -59,11 +59,7 @@
                   <HBox spacing="4.0" alignment="CENTER_LEFT">
                      <children>
                         <CheckBox fx:id="chkRequestPetInfo" selected="true" text="Request Plant info before treating plant" />
-                        <Button fx:id="btnPetInfoHelp" text="?" mnemonicParsing="false" onAction="#helpPetInfoClick" style="-fx-background-color: transparent; -fx-text-fill: #2b7df6; -fx-font-weight: bold; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 0;" prefWidth="22.0" prefHeight="22.0">
-                           <tooltip>
-                              <Tooltip fx:id="ttPetInfoHelp" text="When enabled, the extension will request plant (pet) info before treating to verify wellbeing and avoid accidental treats." />
-                           </tooltip>
-                        </Button>
+                        <Button fx:id="btnPetInfoHelp" text="?" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: #2b7df6; -fx-font-weight: bold; -fx-border-color: transparent; -fx-cursor: hand; -fx-padding: 0;" prefWidth="22.0" prefHeight="22.0" />
                      </children>
                   </HBox>
                </children>
